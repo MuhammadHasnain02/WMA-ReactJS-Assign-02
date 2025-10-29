@@ -1,0 +1,14 @@
+body{
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+.bgDarkTheme{
+  background-color: #1f2937;
+  color: white;
+}
+.bgLightTheme{
+  background-color: #f3f4f6;
+  color: black;
+}
