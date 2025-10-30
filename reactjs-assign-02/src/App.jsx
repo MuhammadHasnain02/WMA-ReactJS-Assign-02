@@ -4,20 +4,44 @@ import './App.css'
 function App() {
   let [isDark, setIsDark] = useState(false);
   let [input, setInput] = useState("");
+  let [isResult , setResult] = useState(false)
 
   let handleClick = (value) => {
-    
-    if (value === "AC") return setInput("")
-    else if (value === "DE") return setInput(input.slice(0 , -1))
-    else if (value === "=") {
+
+    if (value === "=") {
+
       try {
         
-      } catch (error) {
-        
-      }
-    }
-    // else 
+        let expression = input
+          .replace(/×/g , "*")
+          .replace(/÷/g , "/")
+          .replace(/−/g , "-")
 
+        let res = eval(expression)
+        setInput(res.toString())
+        setResult(true)
+
+      } catch (error) {
+        setInput("Error");
+        setResult(true)
+      }
+
+      return
+    }
+
+    if (value === "AC") return setInput("")
+    else if (value === "DE") return setInput((prev) => prev.slice(0 , -1))
+
+    if (isResult && !["÷", "×", "−", "+", "%"].includes(value)) {
+      
+      setInput(value)
+      setResult(false)
+      
+    } else {
+      if (value !== "=") setInput((prev) => prev + value)
+      setResult(false)
+    }
+     
   }
 
   return (
