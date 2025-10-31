@@ -13,20 +13,31 @@ function App() {
 
   let [showHistrTab , setHistrTab] = useState(false)
 
+  // Get and setHistory() history in local storage 
   useEffect(() => {
     let savedHistory = localStorage.getItem("calcHistory")
     if (savedHistory) setHistory(JSON.parse(savedHistory))
     setHasLoaded(true)
   } , [])
 
+  // Set history in local storage
   useEffect(() => {
     if (hasLoaded) return localStorage.setItem("calcHistory", JSON.stringify(history));
   } , [history, hasLoaded])
+
+  // Auto-Scroll in History
+  useEffect(() => {
+    let box = document.querySelector(".history-box")
+    if (box) box.scrollTop = box.scrollHeight
+  } , [history])
 
   // Button click handler 
   let handleClick = (value) => {
 
     if (value === "=") {
+
+      if (input.length === 0) return
+      if (!/[÷×−+%]/.test(input)) return;
 
       try {
         let expression = input
@@ -35,6 +46,12 @@ function App() {
           .replace(/−/g , "-")
 
         let res = eval(expression)
+        
+        if (isNaN(res) || isFinite(res)) {
+          setInput("Error")
+          setResult(true)
+        }
+
         setInput(res.toString())
         setResult(true)
 
@@ -72,20 +89,20 @@ function App() {
 
     }
 
-
     // If result already shown and new number clicked → start new calc
     if (isResult && !["÷", "×", "−", "+", "%"].includes(value)) {
       
       setInput(value)
       setResult(false)
-      
-    } else {
+    }
+    else {
       if (value !== "=") setInput((prev) => prev + value)
       setResult(false)
     }
      
   }
 
+  // Clear History in Local Storage
   const clearHistory = () => {
     setHistory([]);
     localStorage.removeItem("calcHistory");
@@ -174,12 +191,13 @@ function App() {
           </div>
 
           {/* history content */}
-          <div>
+          <div className='history-box flex-1 overflow-y-auto max-h-[47vh] pr-2 my-3'>
             {history.length === 0 ? (
-              <p className="text-gray-500 text-sm">No history yet</p>
-            ) : (
-              <div className="flex flex-col text-lg text-gray-600 font-semibold tracking-wider space-y-1.5 overflow-y-auto">
-                {history.map((h, i) => ( <span key={i}>{h}</span> ))}
+              <p className={`text-sm ${isDark ? "text-white" : "text-black"}`}>
+                No history yet</p>
+              ) : (
+              <div className="flex flex-col text-lg  font-semibold tracking-wider space-y-1.5 overflow-y-auto">
+                {history.map((h, i) => ( <span key={i} className={` ${isDark ? "text-gray-300" : "text-gray-600"}`}>{h}</span> ))}
               </div>
             )}
           </div>
@@ -188,8 +206,8 @@ function App() {
         {/* Footer with clear button */}
         {history.length > 0 && (
 
-          <div className="flex justify-center items-center border-t pt-2">
-            <button className="bg-red-600 text-white font-semibold py-1.5 px-4 rounded-md hover:cursor-pointer hover:bg-red-700 text-sm"
+          <div className="border-t pt-3">
+            <button className="bg-red-600 text-white text-sm font-bold py-1.5 px-5 rounded-md hover:cursor-pointer hover:bg-red-700"
               onClick={clearHistory}>
               Clear History
             </button>
