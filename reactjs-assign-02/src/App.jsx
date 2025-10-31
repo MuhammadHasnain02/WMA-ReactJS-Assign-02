@@ -3,7 +3,8 @@ import './App.css'
 
 function App() {
 
-  // ---------- STATES ----------
+  // -----------<<< STATES >>>----------------
+
   let [input, setInput]   = useState("");
   let [isDark, setIsDark] = useState(false);
   let [isResult , setResult] = useState(false)
@@ -12,6 +13,19 @@ function App() {
   let [hasLoaded, setHasLoaded] = useState(false)
 
   let [showHistrTab , setHistrTab] = useState(false)
+
+  // -------------<<< Use Effects >>>----------------
+
+  // Load theme from localStorage
+  useEffect(() => {
+    let savedTheme = localStorage.getItem("calcTheme")
+    if (savedTheme === "dark") setIsDark(true);
+  },[])
+
+  // Theme changed saved in local storage
+  useEffect(() => {
+    localStorage.setItem("calcTheme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   // Get and setHistory() history in local storage 
   useEffect(() => {
@@ -31,7 +45,8 @@ function App() {
     if (box) box.scrollTop = box.scrollHeight
   } , [history])
 
-  // Button click handler 
+  // ------------<<< Button click handler >>>----------------
+
   let handleClick = (value) => {
 
     if (value === "=") {
@@ -102,6 +117,11 @@ function App() {
      
   }
 
+  // Toggle function
+  let toggleTheme = () => {
+    setIsDark(prev => !prev);
+  };
+
   // Clear History in Local Storage
   const clearHistory = () => {
     setHistory([]);
@@ -125,7 +145,7 @@ function App() {
 
           <div className={`flex flex-row items-center text-[18px] space-x-2.5 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
 
-            <i onClick={() => setIsDark(!isDark)} className= {`transition-all hover:cursor-pointer ${
+            <i onClick={() => { setIsDark(!isDark) , toggleTheme }} className= {`transition-all hover:cursor-pointer ${
             isDark ? "fa-regular fa-moon" : "fa-regular fa-sun"}`} ></i>
             <i onClick={() => setHistrTab(true)} className="fa-solid fa-clock-rotate-left hover:cursor-pointer"></i>
 
@@ -176,13 +196,13 @@ function App() {
       </section>
     
       {/* ---------- 📜 History Section ---------- */}
-      <section className={`flex flex-col justify-between absolute top-0 right-[-260px] h-full w-65 p-4 shadow-lg border-l transition-all duration-700 ease-in-out transform
+      <section className={`flex flex-col justify-between absolute top-0 right-[-261px] h-full w-65 p-4 shadow-lg border-l transition-all duration-700 ease-in-out transform
         ${showHistrTab ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
         ${isDark ? "bg-[#1e1e1e] text-white border-gray-700" : "bg-white text-black border-gray-200"}`}>
 
         <div>
           {/* header with close button */}
-          <div className="flex justify-between items-center mb-3 border-b pb-2">
+          <div className="flex justify-between items-center mb-3 border-b border-gray-300 pb-2">
             
             <h2 className="font-semibold text-lg">History</h2>
             <i className="fa-solid fa-xmark hover:cursor-pointer"
