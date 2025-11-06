@@ -1,49 +1,16 @@
-import { useState , useEffect } from 'react'
+import { useState } from 'react'
 import './App.css'
 
 function App() {
 
   // -----------<<< STATES >>>----------------
 
-  let [input, setInput]   = useState("");
-  let [isDark, setIsDark] = useState(false);
+  let [input, setInput]   = useState("")
+  let [isDark, setIsDark] = useState(false)
   let [isResult , setResult] = useState(false)
 
   let [history, setHistory]  = useState([])
-  let [hasLoaded, setHasLoaded] = useState(false)
-
   let [showHistrTab , setHistrTab] = useState(false)
-
-  // -------------<<< Use Effects >>>----------------
-
-  // Load theme from localStorage
-  useEffect(() => {
-    let savedTheme = localStorage.getItem("calcTheme")
-    if (savedTheme === "dark") setIsDark(true);
-  },[])
-
-  // Theme changed saved in local storage
-  useEffect(() => {
-    localStorage.setItem("calcTheme", isDark ? "dark" : "light");
-  }, [isDark]);
-
-  // Get and setHistory() history in local storage 
-  useEffect(() => {
-    let savedHistory = localStorage.getItem("calcHistory")
-    if (savedHistory) setHistory(JSON.parse(savedHistory))
-    setHasLoaded(true)
-  } , [])
-
-  // Set history in local storage
-  useEffect(() => {
-    if (hasLoaded) return localStorage.setItem("calcHistory", JSON.stringify(history));
-  } , [history, hasLoaded])
-
-  // Auto-Scroll in History
-  useEffect(() => {
-    let box = document.querySelector(".history-box")
-    if (box) box.scrollTop = box.scrollHeight
-  } , [history])
 
   // ------------<<< Button click handler >>>----------------
 
@@ -52,9 +19,10 @@ function App() {
     if (value === "=") {
 
       if (input.length === 0) return
-      if (!/[÷×−+%]/.test(input)) return;
+      if (!/[÷×−+%]/.test(input)) return
 
       try {
+
         let expression = input
           .replace(/×/g , "*")
           .replace(/÷/g , "/")
@@ -81,11 +49,12 @@ function App() {
       return
     }
 
+    // AC and DE Handling
     if (value === "AC") return setInput("")
     else if (value === "DE") return setInput((prev) => prev.slice(0 , -1))
 
     // Operators list
-    let operators = ["÷", "×", "−", "+", "%"];
+    let operators = ["÷", "×", "−", "+", "%"]
 
     // Handle Operators [one at a time]
     if (operators.includes(value)) {
@@ -105,14 +74,18 @@ function App() {
     }
 
     // If result already shown and new number clicked → start new calc
-    if (isResult && !["÷", "×", "−", "+", "%"].includes(value)) {
+
+    if (isResult && !operators.includes(value)) {
       
       setInput(value)
       setResult(false)
+
     }
     else {
+
       if (value !== "=") setInput((prev) => prev + value)
       setResult(false)
+    
     }
      
   }
@@ -124,8 +97,8 @@ function App() {
 
   // Clear History in Local Storage
   const clearHistory = () => {
-    setHistory([]);
-    localStorage.removeItem("calcHistory");
+    setHistory([])
+    localStorage.removeItem("calcHistory")
   };
 
   return (
@@ -172,7 +145,7 @@ function App() {
             <button key={i} onClick={() => handleClick(btn)}
             className={`rounded-lg py-3.5 transition-all duration-800 ease-in-out border border-gray-200 hover:cursor-pointer
                 
-              ${btn === "=" 
+              ${btn === "="
                 ? "bg-[#3d6fc6] text-white border-none hover:bg-[#3B7BF2]" 
                 : isDark 
                   ? "bg-gray-900 border-gray-700 text-white hover:bg-gray-700" 
